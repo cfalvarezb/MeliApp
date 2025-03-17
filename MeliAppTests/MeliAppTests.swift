@@ -6,31 +6,80 @@
 //
 
 import XCTest
+import Combine
 @testable import MeliApp
 
-final class MeliAppTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+class MeliAppTests: XCTestCase {
+    var viewModel: SearchViewModel!
+    var cancellables: Set<AnyCancellable> = []
+    
+    override func setUp() {
+        super.setUp()
+        viewModel = SearchViewModel()
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    override func tearDown() {
+        viewModel = nil
+        cancellables.removeAll()
+        super.tearDown()
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    
+    func testSearchSuccess() {
+        let expectation = XCTestExpectation(description: "Successful search fetch")
+        viewModel.searchQuery = "iPhone"
+        
+        viewModel.$products
+            .dropFirst()
+            .sink { products in
+                XCTAssertFalse(products.isEmpty, "Products should not be empty on success")
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+        
+        viewModel.search()
+        wait(for: [expectation], timeout: 10.0)
     }
+    
+    func testSearchFailure() {
+        let expectation = XCTestExpectation(description: "Search should fail gracefully")
+        viewModel.searchQuery = ""  // Simula búsqueda vacía
+        
+        viewModel.$errorMessage
+            .dropFirst()
+            .sink { errorMessage in
+                if let errorMessage = errorMessage {
+                    XCTAssertFalse(errorMessage.isEmpty, "Error message should not be empty")
+                    expectation.fulfill()
+                }
+            }
+            .store(in: &cancellables)
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+        viewModel.search()
+        
+        wait(for: [expectation], timeout: 10.0)
+    }
+    
+    func testLoadingState() {
+        let expectation = XCTestExpectation(description: "Loading state should toggle correctly")
+        viewModel.searchQuery = "Samsung"
+
+        var loadingStates: [Bool] = []
+
+        viewModel.$isLoading
+            .sink { isLoading in
+                loadingStates.append(isLoading)
+            }
+            .store(in: &cancellables)
+
+        viewModel.search()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {  // Se da tiempo a la actualización
+            XCTAssertTrue(loadingStates.contains(true), "isLoading should be true at the start")
+            XCTAssertTrue(loadingStates.contains(false), "isLoading should be false at the end")
+            expectation.fulfill()
         }
-    }
 
+        wait(for: [expectation], timeout: 10.0)
+    }
 }
+

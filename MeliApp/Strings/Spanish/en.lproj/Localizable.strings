@@ -1,0 +1,16 @@
+/* 
+  Localizable.strings
+  MeliApp
+
+  Created by mac_user  on 15/03/25.
+  
+*/
+"app_name" = "Mercado Libre (es)";
+"search_placeholder" = "Buscar producto...";
+"search_button" = "Buscar";
+"error_empty_search" = "El campo de busqueda esta vacio.";
+"loading_message" = "Cargando...";
+"product_price" = "Precio: $%.2f";
+"product_detail_title" = "Detalle producto";
+"refresh_message" = "Empuja para refrescar";
+"error_word_less_three_characters_search" = "Palabra debe ser mayor a 3 caracteres";
