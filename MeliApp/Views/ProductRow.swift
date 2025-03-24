@@ -32,7 +32,7 @@ struct ProductRow: View {
             }
         }
         .padding()
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white)
         .cornerRadius(10)
         .shadow(radius: 3)
