@@ -42,13 +42,14 @@ struct ProductDetailView: View {
                     .transition(.move(edge: .bottom))
                     .animation(.easeInOut(duration: 0.5), value: product.price)
             }
+            .accessibilityIdentifier("ProductDetailTitle")
             .frame(maxWidth: .infinity)
             .padding(.all)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity) // Ensures VStack fills the entire screen
         .padding(.top)
         .navigationTitle(Localized.productDetailTitle)
-        .font(.mercadoLibreFont).accessibilityIdentifier("ProductDetailTitle")
+        .font(.mercadoLibreFont)
         .background(Color.mercadoLibreYellow.edgesIgnoringSafeArea(.all))
     }
 
